@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frogger-Round 1! '\_("-")_/"</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script>
+        //javascript!sss
+
+        let speed1 = 7;
+        let speed2 = 5;
+        let speed3 = 10;
+
+        let count = 3;
+        let point = 0;
+
+        let ctx;
+        let cars = [];
+        let chicken;
+        let a;
+        let line1 = new Image();
+        line1.src = "img/RoadLines";
+
+
+        function initialize()
+        {
+            ctx = document.getElementById("myCanvas").getContext("2d");
+            ctx.fillStyle="rgb(186,209,255)";
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+            drawShapes();
+            cars.push(createImage("img/policeCar.PNG", "cop3", -600, 530, 160, 70));
+            cars.push(createImage("img/policeCar.PNG", "cop3", -100, 530, 160, 70));
+
+            cars.push(createImage("img/policeCar.PNG", "cop1", -1300, 360, 160, 70));
+            cars.push(createImage("img/policeCar.PNG", "cop1", -1500, 360, 160, 70));
+
+            cars.push(createImage("img/policeCar.PNG", "cop2", -250, 210, 160, 70));
+            cars.push(createImage("img/policeCar.PNG", "cop2", -650, 210, 160, 70));
+
+            chicken = createImage("img/chicken.png", "slippy", 920, 850, 50 , 50);
+            ctx.drawImage(chicken, chicken.left, chicken.top, chicken.width, chicken.height);
+            draw();
+            for (let i=0; i<cars.length; i++)
+            {
+                ctx.drawImage(cars[i], cars[i].left, cars[i].top, cars[i].width, cars[i].height);
+            }
+        }
+
+        function draw()
+        {
+            a=requestAnimationFrame(draw);
+            ctx=document.getElementById("myCanvas").getContext("2d");
+            ctx.fillStyle="rgb(65,175,98)";
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+            checkWin();
+            drawShapes();
+            drawCars() ;
+            moveChicken();
+            checkCollision();
+            checkBridge();
+        }
+
+        function drawShapes() //this is the 'boss' function, and it will control my entire picture/canvas
+        {
+            drawRectangle(0, 90, 1890, 30, "#7c7c7c");
+
+            drawRectangle(0, 120, 1890, 550, "#000000");
+
+            drawRectangle(0, 290, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(280, 290, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(600, 290, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(920, 290, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(1240, 290, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(1560, 290, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+
+            drawRectangle(0, 450, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(280, 450, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(600, 450, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(920, 450, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(1240, 450, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+            drawRectangle(1560, 450, 189, 20, "#d3b31b"); //Hey!! do you thing drawRectangle!
+
+            drawRectangle(0, 650, 1890, 30, "#7c7c7c");
+
+            drawRectangle(0, 680, 1890, 100, "#27eee3");//water
+
+            drawRectangle(980, 680, 80, 100, "#703e15");//bridge
+
+            drawRectangle(0, 800, 1890, 100, "#ad785d");//dirt
+        }
+
+        function drawRectangle(xPos, yPos, width, height, color)
+        {
+            //draw some happy rectangles
+            //associate or 'join' the canvas
+            let canvas = document.getElementById("myCanvas");
+            //now anything that happens to 'let canvas' will effect 'myCanvas' on HTML
+            let ctx = canvas.getContext("2d"); //associates 2D draw tools with your canvas
+            ctx.fillStyle = color;//get color value from function parameter
+            ctx.fillRect(xPos, yPos, width, height);
+        }
+
+        function moveChicken()
+        {
+            ctx.drawImage(chicken, chicken.left, chicken.top, chicken.width, chicken.height);
+        }
+
+        function drawCars()
+        {
+            for (let i=0; i<cars.length; i++)
+            {
+
+                if (i == 0 || i ==1)
+                {
+                    cars[i].left += speed1;
+                    if(cars[i].left > 1890)
+                    {
+                        cars[i].left = -180;
+                    }
+                }
+
+                else if (i == 2 || i == 3)
+                {
+                    cars[i].left -= speed2;
+                    if(cars[i].left < 0)
+                    {
+                        cars[i].left = 1900;
+                    }
+                }
+
+                else if (i == 4 || i == 5)
+                {
+                    cars[i].left += speed3;
+                    if(cars[i].left > 1890)
+                    {
+                        cars[i].left = -180;
+                    }
+                }
+                ctx.drawImage(cars[i], cars[i].left, cars[i].top, cars[i].width, cars[i].height);
+                //check if car hits right of the canvas boundary
+                checkCollision();
+
+            }
+        }
+
+        if (point = 0)
+        {
+            alert ("You lose you dont have anymore lives left");
+            a=cancelAnimationFrame(draw);
+        }
+
+        function checkWin()
+        {
+            if(chicken.top < 90)
+            {
+                point++;
+                alert("You won! " + " you have " + count + " lives left and have earned " + point + " points");
+                Moveon = prompt ("Next level or replay the current level? (type: move on or replay) (if on 2nd level then move on will not work*)");
+                if (Moveon === "move on")
+                {
+                    alert ("now the game will get faster good luck!");
+                    chicken.left = 920;
+                    chicken.top = 850;
+                    speed1 = 15;
+                    speed2= 10;
+                    speed3= 10;
+                }
+                else
+                {
+                    chicken.left = 920;
+                    chicken.top = 850;
+                }
+            }
+            document.getElementById("disp2").innerHTML = point.toString();
+        }
+
+        function checkBridge()
+        {
+            if( chicken.top < 680 + 100
+                && chicken.top + chicken.height > 680)
+            {
+                if(chicken.left < 980 + 80
+                    && chicken.left + chicken.width > 980)
+                {
+                 //Do NOTHING
+                }
+                else
+                {
+                    alert("try again! -1 life");
+                    chicken.left = 920;
+                    chicken.top = 850;
+                    count--;
+                }
+                document.getElementById("disp").innerHTML = count.toString();
+            }
+
+        }
+
+
+        //global variable are not made in functions
+
+        function checkCollision()
+        {
+            for (let i=0; i < cars.length; i++)
+            {
+                if (chicken.top < cars[i].top + cars[i].height //Check
+                    && chicken.left + chicken.width > cars[i].left
+                    && chicken.top + chicken.height > cars[i].top
+                    && chicken.left < cars[i].left + cars[i].width)
+                {
+                    alert("you have bumped into a car! -1 life");
+                    chicken.left = 920;
+                    chicken.top = 850;
+                    count--;
+                }
+                document.getElementById("disp").innerHTML = count.toString();
+            }
+
+        }
+
+
+        $(document).keydown(function(event) {
+            //jQuery code to recognize a keydown event
+            let keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == 87) //w up
+            {
+                chicken.top = chicken.top - 25;
+            }
+
+            if (keycode == 83) //s down
+            {
+                chicken.top = chicken.top + 25;
+            }
+            if (keycode == 68) //d right
+            {
+                chicken.left = chicken.left + 25;
+            }
+            if (keycode == 65) //a left
+            {
+                chicken.left = chicken.left - 25;
+            }
+        });
+
+        let createImage = function(src, title, xcord, ycord, width, height)
+        {
+            let img = new Image();
+            img.src = src;
+            img.alt = title; //hover-over text for image
+            img.title = title;
+            img.left = xcord;
+            img.top = ycord;
+            img.width = width;
+            img.height = height;
+
+            return img;
+        };
+        </script>
+</head>
+<body onload="initialize()">
+<canvas id="myCanvas" width="1890" height="900" style="border: 1px solid"></canvas>
+<br>
+<table id="table" border="solid">
+    <tr>
+        <th>Lives left:<p id="disp"></p></th>
+        <br>
+        <th>Points earned:<p id="disp2"></p></th>
+    </tr>
+</table>
+</body>
+</html>
